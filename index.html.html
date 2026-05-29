@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Getränkestand Rechner</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: white;
+      min-height: 100vh;
+      padding: 8px;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    body.light {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 8px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .theme-btn {
+      padding: 6px 12px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      font-size: 14px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    @media (max-width: 1024px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    
+    body.light .card {
+      background: white;
+      color: #0f172a;
+    }
+    
+    .card-label {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    
+    .card-price {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-bottom: 8px;
+    }
+    
+    .card-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .btn-minus, .btn-plus {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 28px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-minus {
+      background: rgba(239, 68, 68, 0.2);
+      color: white;
+    }
+    
+    .btn-plus {
+      background: rgba(34, 197, 94, 0.2);
+      color: white;
+    }
+    
+    .count {
+      font-size: 18px;
+      font-weight: bold;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .order-section {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    
+    body.light .order-section {
+      background: white;
+      color: #0f172a;
+    }
+    
+    .order-section h2 {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    
+    .order-empty {
+      opacity: 0.6;
+      font-size: 14px;
+    }
+    
+    .order-totals {
+      border-top: 1px solid #475569;
+      margin-top: 8px;
+      padding-top: 8px;
+      font-size: 12px;
+      opacity: 0.8;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .pfand-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .pfand-section { grid-template-columns: 1fr; }
+    }
+    
+    .pfand-section h2 {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    
+    .pfand-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 4px;
+    }
+    
+    .pfand-label {
+      font-size: 14px;
+    }
+    
+    .pfand-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .pfand-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .pfand-btn-minus {
+      background: rgba(239, 68, 68, 0.2);
+      color: white;
+    }
+    
+    .pfand-btn-plus {
+      background: rgba(34, 197, 94, 0.2);
+      color: white;
+    }
+    
+    .pfand-count {
+      width: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+    
+    .total-section {
+      background: #1e293b;
+      position: sticky;
+      bottom: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+    }
+    
+    body.light .total-section {
+      background: white;
+      color: #0f172a;
+    }
+    
+    .total-row-big {
+      display: flex;
+      justify-content: space-between;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .cash-input {
+      width: 100%;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 14px;
+      color: inherit;
+      margin-bottom: 8px;
+    }
+    
+    body.light .cash-input {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+    }
+    
+    .change-display {
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .change-positive {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+    }
+    
+    .change-negative {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+    
+    .reset-btn {
+      width: 100%;
+      background: black;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    body.light .reset-btn {
+      background: #0f172a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🍷 Getränkestand Rechner</h1>
+      <button class="theme-btn" id="themeBtn">☀️ Light</button>
+    </div>
+
+    <div class="grid" id="productsGrid"></div>
+
+    <div class="order-section">
+      <h2>Bestellübersicht</h2>
+      <div id="orderList" class="order-empty">Noch nichts ausgewählt</div>
+      <div class="order-totals" id="orderTotals"></div>
+    </div>
+
+    <div class="pfand-section">
+      <div>
+        <h2>Zusätzliches Pfand</h2>
+        <div id="depositInList"></div>
+      </div>
+      <div>
+        <h2>Pfand zurück</h2>
+        <div id="depositOutList"></div>
+      </div>
+    </div>
+
+    <div class="total-section">
+      <div class="total-row-big">
+        <span>Gesamt</span>
+        <span id="totalDisplay">0.00 €</span>
+      </div>
+      <input type="number" class="cash-input" id="cashInput" placeholder="Erhalten (€)" />
+      <div id="changeDisplay"></div>
+      <button class="reset-btn" id="resetBtn">Neue Bestellung</button>
+    </div>
+  </div>
+
+  <script>
+    const products = [
+      { name: '🍷 Wein', price: 6, deposit: 'Glaspfand' },
+      { name: '🍸 Cocktail', price: 7, deposit: 'Glaspfand' },
+      { name: '🥛 Weinschorle', price: 4, deposit: 'Glaspfand' },
+      { name: '🥂 Sekt', price: 4, deposit: 'Glaspfand' },
+      { name: '🚀 Shot', price: 3, deposit: 'Glaspfand' },
+      { name: '🥤 Softdrink', price: 2.5, deposit: 'Glaspfand' },
+      { name: '🚰 Wasser 0,2', price: 2, deposit: 'Glaspfand' },
+      { name: '🍾 Weinflasche', price: 18 },
+      { name: '🍾 Sektflasche', price: 25 },
+      { name: '💧 Wasser Flasche', price: 6 }
+    ];
+
+    const deposits = [
+      { name: 'Glaspfand', price: 3 },
+      { name: 'Karaffenpfand', price: 5 }
+    ];
+
+    let items = {};
+    let depositIn = {};
+    let depositOut = {};
+    let cashReceived = '';
+    let theme = 'dark';
+
+    function formatEUR(amount) {
+      return amount.toFixed(2).replace('.', ',') + ' €';
+    }
+
+    function add(key, obj) {
+      obj[key] = (obj[key] || 0) + 1;
+    }
+
+    function remove(key, obj) {
+      obj[key] = Math.max((obj[key] || 0) - 1, 0);
+      if (obj[key] === 0) delete obj[key];
+    }
+
+    function getProductSum() {
+      return products.reduce((sum, p) => sum + (items[p.name] || 0) * p.price, 0);
+    }
+
+    function getAutoGlassDeposit() {
+      return products.reduce((sum, p) =>
+        p.deposit === 'Glaspfand'
+          ? sum + (items[p.name] || 0) * 3
+          : sum
+      , 0);
+    }
+
+    function getDepositSum() {
+      return deposits.reduce((sum, d) => sum + (depositIn[d.name] || 0) * d.price, 0);
+    }
+
+    function getReturnSum() {
+      return deposits.reduce((sum, d) => sum + (depositOut[d.name] || 0) * d.price, 0);
+    }
+
+    function getTotal() {
+      return getProductSum() + getAutoGlassDeposit() + getDepositSum() - getReturnSum();
+    }
+
+    function getChange() {
+      if (cashReceived === '') return null;
+      return parseFloat(cashReceived || 0) - getTotal();
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = products.map(p => `
+        <div class="card">
+          <div class="card-label">${p.name}</div>
+          <div class="card-price">${formatEUR(p.price)}</div>
+          <div class="card-buttons">
+            <button class="btn-minus" onclick="removeProduct('${p.name}')">−</button>
+            <div class="count">${items[p.name] || 0}</div>
+            <button class="btn-plus" onclick="addProduct('${p.name}')">+</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderOrder() {
+      const orderList = document.getElementById('orderList');
+      const orderTotals = document.getElementById('orderTotals');
+      
+      const itemEntries = Object.entries(items);
+      if (itemEntries.length === 0) {
+        orderList.innerHTML = '<div class="order-empty">Noch nichts ausgewählt</div>';
+        orderTotals.innerHTML = '';
+        return;
+      }
+      
+      orderList.innerHTML = itemEntries.map(([name, count]) => {
+        const p = products.find(x => x.name === name);
+        return `<div class="order-item"><span>${count}× ${name}</span><span>${formatEUR(count * p.price)}</span></div>`;
+      }).join('');
+      
+      const totals = [];
+      const autoGlass = getAutoGlassDeposit();
+      const depositSum = getDepositSum();
+      const returnSum = getReturnSum();
+      
+      if (autoGlass > 0) totals.push(`<div class="total-row"><span>Glaspfand</span><span>${formatEUR(autoGlass)}</span></div>`);
+      if (depositSum > 0) totals.push(`<div class="total-row"><span>Zusätzliches Pfand</span><span>${formatEUR(depositSum)}</span></div>`);
+      if (returnSum > 0) totals.push(`<div class="total-row"><span>Pfandrückgabe</span><span>-${formatEUR(returnSum)}</span></div>`);
+      
+      orderTotals.innerHTML = totals.join('');
+    }
+
+    function renderDeposits() {
+      const depositInList = document.getElementById('depositInList');
+      const depositOutList = document.getElementById('depositOutList');
+      
+      depositInList.innerHTML = deposits.map(d => `
+        <div class="pfand-item">
+          <div class="pfand-label">${d.name} <span style="opacity:0.6">(${d.price}€)</span></div>
+          <div class="pfand-controls">
+            <button class="pfand-btn pfand-btn-minus" onclick="removeDepositIn('${d.name}')">−</button>
+            <span class="pfand-count">${depositIn[d.name] || 0}</span>
+            <button class="pfand-btn pfand-btn-plus" onclick="addDepositIn('${d.name}')">+</button>
+          </div>
+        </div>
+      `).join('');
+      
+      depositOutList.innerHTML = deposits.map(d => `
+        <div class="pfand-item">
+          <div class="pfand-label">${d.name} <span style="opacity:0.6">(-${d.price}€)</span></div>
+          <div class="pfand-controls">
+            <button class="pfand-btn pfand-btn-minus" onclick="removeDepositOut('${d.name}')">−</button>
+            <span class="pfand-count">${depositOut[d.name] || 0}</span>
+            <button class="pfand-btn pfand-btn-plus" onclick="addDepositOut('${d.name}')">+</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderTotal() {
+      document.getElementById('totalDisplay').textContent = formatEUR(getTotal());
+      
+      const change = getChange();
+      const changeDisplay = document.getElementById('changeDisplay');
+      
+      if (change === null) {
+        changeDisplay.innerHTML = '';
+      } else {
+        changeDisplay.innerHTML = `<div class="change-display ${change >= 0 ? 'change-positive' : 'change-negative'}">Wechselgeld: ${formatEUR(change)}</div>`;
+      }
+    }
+
+    function render() {
+      renderProducts();
+      renderOrder();
+      renderDeposits();
+      renderTotal();
+    }
+
+    function addProduct(name) { add(name, items); render(); }
+    function removeProduct(name) { remove(name, items); render(); }
+    function addDepositIn(name) { add(name, depositIn); render(); }
+    function removeDepositIn(name) { remove(name, depositIn); render(); }
+    function addDepositOut(name) { add(name, depositOut); render(); }
+    function removeDepositOut(name) { remove(name, depositOut); render(); }
+
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      document.body.className = theme === 'dark' ? '' : 'light';
+      document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    });
+
+    document.getElementById('cashInput').addEventListener('input', (e) => {
+      cashReceived = e.target.value;
+      renderTotal();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      items = {};
+      depositIn = {};
+      depositOut = {};
+      cashReceived = '';
+      document.getElementById('cashInput').value = '';
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
